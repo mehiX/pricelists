@@ -10,6 +10,7 @@ import (
 	"time"
 
 	server "github.com/mehix/pricelists"
+	"github.com/mehix/pricelists/service/pricelist"
 )
 
 func main() {
@@ -22,7 +23,13 @@ func main() {
 
 	addr := os.Args[1]
 
-	app := server.New()
+	svc, err := pricelist.NewServiceForH2(os.Getenv("DB_URL"))
+	if err != nil {
+		panic(err)
+	}
+	defer svc.Close()
+
+	app := server.New(server.WithPricelist(svc))
 
 	srvr := http.Server{
 		Addr:    addr,

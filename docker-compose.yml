@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  pricelists:
+    image: pricelists
+    build:
+      context: .
+    environment:
+      DB_URL: h2://sa@database/testdb?mem=true
+    ports:
+      - 8080:80
+
+  database:
+    image: h2:1.0
+    build:
+      context: ./database

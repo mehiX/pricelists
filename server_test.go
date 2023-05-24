@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/mehix/pricelists/service/pricelist"
 )
+
+func init() {
+	godotenv.Load()
+}
 
 func TestHealthEndpoint(t *testing.T) {
 
@@ -67,10 +73,18 @@ func TestPrices(t *testing.T) {
 		{date: "2020-06-16", time: "21:00:00", productID: 35455, brand: "ZARA", finalPrice: 33895},
 	}
 
-	app := New(WithPricelist(pricelist.NewService()))
+	// start the application with supporting services
+	svc, err := pricelist.NewServiceForH2(os.Getenv("DB_URL"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(svc.Close)
+
+	app := New(WithPricelist(svc))
 	srvr := httptest.NewTLSServer(app.Handlers())
 	t.Cleanup(srvr.Close)
 
+	// run tests
 	for _, s := range scenarios {
 		url := fmt.Sprintf("%s/prices/prod/%d/brand/%s/date/%s/time/%s", srvr.URL, s.productID, s.brand, s.date, s.time)
 		t.Run(url, func(t *testing.T) {
