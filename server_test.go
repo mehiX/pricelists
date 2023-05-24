@@ -70,7 +70,7 @@ func TestPrices(t *testing.T) {
 		{date: "2020-06-14", time: "16:00:00", productID: 35455, brand: "ZARA", finalPrice: 2545},
 		{date: "2020-06-14", time: "21:00:00", productID: 35455, brand: "ZARA", finalPrice: 3550},
 		{date: "2020-06-15", time: "10:00:00", productID: 35455, brand: "ZARA", finalPrice: 3050},
-		{date: "2020-06-16", time: "21:00:00", productID: 35455, brand: "ZARA", finalPrice: 33895},
+		{date: "2020-06-16", time: "21:00:00", productID: 35455, brand: "ZARA", finalPrice: 3895},
 	}
 
 	// start the application with supporting services

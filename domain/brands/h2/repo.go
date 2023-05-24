@@ -23,17 +23,27 @@ func NewRepository(url string) (brands.Repository, error) {
 	conn, err := f(ctx, url)
 
 	if conn != nil {
-		if _, err := conn.Exec("CREATE TABLE brands (id int not null, name varchar(50))"); err != nil {
-			log.Println("Creating BRANDS", err)
+		initDB(conn)
+	}
+
+	return &repo{conn: conn}, err
+}
+
+func initDB(conn *sql.DB) {
+	if _, err := conn.Exec("CREATE TABLE IF NOT EXISTS brands (id int not null, name varchar(50))"); err != nil {
+		log.Println("Creating BRANDS", err)
+	} else {
+		conn.Exec("DELETE FROM BRANDS")
+		stmt, err := conn.Prepare("insert into brands values (?, ?)")
+		if err == nil {
+			stmt.Exec(1, "ZARA")
+			stmt.Exec(2, "PULL&BEAR")
+			stmt.Exec(3, "H&M")
 		} else {
-			if _, err := conn.Exec("insert into brands values (?, ?)", 1, "ZARA"); err != nil {
-				log.Println("Inserting into BRANDS", err)
-			} else {
-				fmt.Println("BRANDS populated with initial data")
-			}
+			fmt.Printf("BRANDS preparing statement: %v\n", err)
 		}
 	}
-	return &repo{conn: conn}, err
+
 }
 
 func (r *repo) Close() {

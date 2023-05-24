@@ -9,9 +9,14 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/joho/godotenv"
 	server "github.com/mehix/pricelists"
 	"github.com/mehix/pricelists/service/pricelist"
 )
+
+func init() {
+	godotenv.Load()
+}
 
 func main() {
 	if len(os.Args) < 2 {

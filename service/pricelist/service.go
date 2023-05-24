@@ -13,6 +13,7 @@ import (
 )
 
 type PriceDetails struct {
+	ProductID int64
 	StartDate time.Time
 	EndDate   time.Time
 	Price     int64
@@ -83,6 +84,7 @@ func (s *service) ProductPriceForTime(ctx context.Context, brandName string, pro
 
 	p := priceLists[0]
 	pd := PriceDetails{
+		ProductID: p.ProductID,
 		Price:     p.Price,
 		StartDate: p.StartDate,
 		EndDate:   p.EndDate,

@@ -25,29 +25,36 @@ func NewRepository(url string) (prices.Repository, error) {
 	conn, err := f(ctx, url)
 
 	if conn != nil {
-		if _, err := conn.Exec(`CREATE TABLE PRICE_LIST (
-			brand_id int not null,
-			start_date datetime not null,
-			end_date datetime not null,
-			price_list int not null,
-			product_id int not null,
-			priority int not null default 0,
-			price int not null,
-			currency varchar(3) not null default 'EUR'
-		)`); err != nil {
-			log.Println("Creating PRICE_LIST", err)
-		} else {
-			if _, err := conn.Exec(`insert into PRICE_LIST values (
-				1, '2020-06-14 00:00:00', '2020-12-31 23:59:59', 1, 35455, 0, 3550, 'EUR'
-			)`); err != nil {
-				log.Println("Inserting into PRICE_LIST", err)
-			} else {
-				fmt.Println("PRICE_LIST populated with data")
-			}
-		}
+		initDB(conn)
 	}
 
 	return &repo{conn: conn}, err
+}
+
+func initDB(conn *sql.DB) {
+	if _, err := conn.Exec(`CREATE TABLE IF NOT EXISTS PRICE_LIST (
+		brand_id int not null,
+		start_date datetime not null,
+		end_date datetime not null,
+		price_list int not null,
+		product_id int not null,
+		priority int not null default 0,
+		price int not null,
+		currency varchar(3) not null default 'EUR'
+	)`); err != nil {
+		log.Println("Creating PRICE_LIST", err)
+	} else {
+		conn.Exec("DELETE FROM PRICE_LIST")
+		stmt, err := conn.Prepare(`insert into PRICE_LIST values (?,?,?,?,?,?,?,?)`)
+		if err == nil {
+			stmt.Exec(1, "2020-06-14 00:00:00", "2020-12-31 23:59:59", 1, 35455, 0, 3550, "EUR")
+			stmt.Exec(1, "2020-06-14 15:00:00", "2020-06-14 18:30:00", 2, 35455, 1, 2545, "EUR")
+			stmt.Exec(1, "2020-06-15 00:00:00", "2020-06-15 11:00:00", 3, 35455, 1, 3050, "EUR")
+			stmt.Exec(1, "2020-06-15 16:00:00", "2020-12-31 23:59:59", 4, 35455, 1, 3895, "EUR")
+		} else {
+			fmt.Printf("PRICE_LIST preparing statement: %v\n", err)
+		}
+	}
 }
 
 func (r *repo) Close() {

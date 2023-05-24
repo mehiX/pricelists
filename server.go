@@ -38,8 +38,13 @@ func (s *server) Handlers() http.Handler {
 }
 
 type PriceResponse struct {
-	Price        int64  `json:"price"`
-	PriceDisplay string `json:"price_display"`
+	ProductID    int64     `json:"product_id"`
+	BrandName    string    `json:"brand_name"`
+	StartDate    time.Time `json:"start_date"`
+	EndDate      time.Time `json:"end_date"`
+	Price        int64     `json:"price"`
+	PriceDisplay string    `json:"price_display"`
+	Currency     string    `json:"currency"`
 }
 
 func (s *server) handlePriceRequest(w http.ResponseWriter, r *http.Request) {
@@ -74,8 +79,13 @@ func (s *server) handlePriceRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(PriceResponse{
+		ProductID:    priceDetails.ProductID,
+		BrandName:    priceDetails.BrandName,
+		StartDate:    priceDetails.StartDate,
+		EndDate:      priceDetails.EndDate,
 		Price:        priceDetails.Price,
 		PriceDisplay: fmt.Sprintf("%.2f", float64(priceDetails.Price)/100),
+		Currency:     priceDetails.Currency,
 	})
 }
 
