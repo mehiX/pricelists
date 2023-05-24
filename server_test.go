@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -69,10 +70,22 @@ func TestPrices(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer resp.Body.Close()
+
 			if resp.StatusCode != http.StatusOK {
 				t.Fatalf("wrong response code. expected: %d, got: %d", http.StatusOK, resp.StatusCode)
 			}
 
+			expCT := "application/json"
+			gotCT := resp.Header.Get("Content-Type")
+			if gotCT != expCT {
+				t.Fatalf("wrong Content-Type header. expected: %s, got: %s", expCT, gotCT)
+			}
+
+			var price PriceResponse
+			if err := json.NewDecoder(resp.Body).Decode(&price); err != nil {
+				t.Fatal(err)
+			}
 		})
 	}
 

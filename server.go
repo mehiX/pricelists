@@ -27,8 +27,14 @@ func (s *server) Handlers() http.Handler {
 	})
 
 	r.Get("/prices/prod/{productID}/brand/{brandName}/date/{date:[0-9-]{10}}/time/{time:[0-9:]{8}}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	})
 
 	return r
+}
+
+type PriceResponse struct {
+	Price        int64  `json:"price"`
+	PriceDisplay string `json:"price_display"`
 }
