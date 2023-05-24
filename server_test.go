@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
+
+	"github.com/mehix/pricelists/service/pricelist"
 )
 
 func TestHealthEndpoint(t *testing.T) {
@@ -29,12 +30,23 @@ func TestHealthEndpoint(t *testing.T) {
 	}
 }
 
-func mustParse(s string) time.Time {
-	t, err := time.Parse("2006-01-02 15:04:05", s)
+func TestNotImplementedIfNoService(t *testing.T) {
+
+	app := New()
+	srvr := httptest.NewTLSServer(app.Handlers())
+	defer srvr.Close()
+
+	url := fmt.Sprintf("%s/prices/prod/%d/brand/%s/date/%s/time/%s", srvr.URL, 12345, "ZARA", "2020-06-14", "15:00:00")
+
+	resp, err := srvr.Client().Get(url)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-	return t
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNotImplemented {
+		t.Fatalf("wrong response code. expected: %d, got: %d", http.StatusNotImplemented, resp.StatusCode)
+	}
 }
 
 func TestPrices(t *testing.T) {
@@ -55,14 +67,14 @@ func TestPrices(t *testing.T) {
 		{date: "2020-06-16", time: "21:00:00", productID: 35455, brand: "ZARA", finalPrice: 33895},
 	}
 
-	app := New()
+	app := New(WithPricelist(pricelist.NewService()))
 	srvr := httptest.NewTLSServer(app.Handlers())
 	t.Cleanup(srvr.Close)
 
 	for _, s := range scenarios {
 		url := fmt.Sprintf("%s/prices/prod/%d/brand/%s/date/%s/time/%s", srvr.URL, s.productID, s.brand, s.date, s.time)
 		t.Run(url, func(t *testing.T) {
-			//s := s
+			s := s
 
 			t.Parallel()
 
@@ -85,6 +97,10 @@ func TestPrices(t *testing.T) {
 			var price PriceResponse
 			if err := json.NewDecoder(resp.Body).Decode(&price); err != nil {
 				t.Fatal(err)
+			}
+
+			if price.Price != s.finalPrice {
+				t.Fatalf("wrong price. expected: %d, got: %d", s.finalPrice, price.Price)
 			}
 		})
 	}

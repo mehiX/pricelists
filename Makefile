@@ -1,7 +1,7 @@
 .PHONY: test-unit
 test-unit:
 	go clean -testcache
-	go test -v -race -cover -coverprofile=cover.out ./...
+	go test -race -cover -coverprofile=cover.out ./...
 	go tool cover -html=cover.out -o cover.html
 
 .PHONY: binary
