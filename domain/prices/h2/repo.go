@@ -37,10 +37,13 @@ func (r *repo) Close() {
 	}
 }
 
-func (r *repo) ListAllForTime(ctx context.Context, t time.Time) ([]prices.PriceDetails, error) {
-	qry := "select * from pricelist where ? >= startDate and ? <= endDate"
+func (r *repo) ListAllForTime(ctx context.Context, brandID, productID int64, t time.Time) ([]prices.PriceDetails, error) {
+	qry := `select brand_id, start_date, end_date, price_list, product_id, priority, price, currency 
+	from pricelist 
+	where ? >= startDate and ? <= endDate and brandId = ? and productId = ? 
+	order by priority desc;`
 
-	rows, err := r.conn.QueryContext(ctx, qry, t, t)
+	rows, err := r.conn.QueryContext(ctx, qry, t, t, brandID, productID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +52,7 @@ func (r *repo) ListAllForTime(ctx context.Context, t time.Time) ([]prices.PriceD
 	var details []prices.PriceDetails
 	for rows.Next() {
 		var d prices.PriceDetails
-		if err := rows.Scan(&d.BrandID, &d.StartDate, &d.EndDate); err != nil {
+		if err := rows.Scan(&d.BrandID, &d.StartDate, &d.EndDate, &d.PriceList, &d.ProductID, &d.Priority, &d.Price, &d.Currency); err != nil {
 			log.Printf("scanning sql row: %v\n", err)
 			continue
 		}
