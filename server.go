@@ -26,5 +26,9 @@ func (s *server) Handlers() http.Handler {
 		w.WriteHeader(http.StatusOK)
 	})
 
+	r.Get("/prices/prod/{productID}/brand/{brandName}/date/{date:[0-9-]{10}}/time/{time:[0-9:]{8}}", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	return r
 }
