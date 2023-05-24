@@ -22,6 +22,17 @@ func NewRepository(url string) (brands.Repository, error) {
 	f := h2.ConnectWithRetry(h2.ConnectDB, 5, time.Second, time.Minute)
 	conn, err := f(ctx, url)
 
+	if conn != nil {
+		if _, err := conn.Exec("CREATE TABLE brands (id int not null, name varchar(50))"); err != nil {
+			log.Println("Creating BRANDS", err)
+		} else {
+			if _, err := conn.Exec("insert into brands values (?, ?)", 1, "ZARA"); err != nil {
+				log.Println("Inserting into BRANDS", err)
+			} else {
+				fmt.Println("BRANDS populated with initial data")
+			}
+		}
+	}
 	return &repo{conn: conn}, err
 }
 
@@ -46,12 +57,15 @@ func (r *repo) ListAll(ctx context.Context) ([]brands.Brand, error) {
 
 	var all []brands.Brand
 	for rows.Next() {
-		var b brands.Brand
-		if err := rows.Scan(&b.ID, &b.Name); err != nil {
+		var (
+			id   int64
+			name string
+		)
+		if err := rows.Scan(&id, &name); err != nil {
 			log.Printf("scanning brand row: %v\n", err)
 			continue
 		}
-		all = append(all, b)
+		all = append(all, brands.Brand{ID: id, Name: name})
 	}
 
 	return all, nil
@@ -59,7 +73,7 @@ func (r *repo) ListAll(ctx context.Context) ([]brands.Brand, error) {
 
 func (r *repo) FindByName(ctx context.Context, name string) (brands.Brand, error) {
 
-	qry := "select id, name from brands where name = ?"
+	qry := "select id, name from BRANDS where name=?"
 
 	row := r.conn.QueryRowContext(ctx, qry, name)
 	if row.Err() != nil {

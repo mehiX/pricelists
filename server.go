@@ -50,6 +50,7 @@ func (s *server) handlePriceRequest(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-type", "application/json")
 
+	// read and validate request parameters
 	productID, err := strconv.ParseInt(chi.URLParam(r, "productID"), 10, 64)
 	if err != nil {
 		respondError(w, err, http.StatusBadRequest)
@@ -65,9 +66,11 @@ func (s *server) handlePriceRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// call business logic
 	priceDetails, err := s.pricelistSvc.ProductPriceForTime(r.Context(), brandName, productID, datetime)
 	if err != nil {
 		respondError(w, err, http.StatusNotFound)
+		return
 	}
 
 	json.NewEncoder(w).Encode(PriceResponse{

@@ -6,7 +6,8 @@ services:
     build:
       context: .
     environment:
-      DB_URL: h2://sa@database/testdb?mem=true
+      PRICELIST_DB_URL: host=database port=5435 user=sa dbname=/tmp/pricelist sslmode=disable
+      BRANDS_DB_URL: host=database port=5435 user=sa dbname=/tmp/brands sslmode=disable
     ports:
       - 8080:80
 
@@ -14,3 +15,7 @@ services:
     image: h2:1.0
     build:
       context: ./database
+    ports:
+    - 8082:8082
+    - 9092:9092
+    - 5435:5435

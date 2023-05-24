@@ -37,13 +37,13 @@ func NewService() Service {
 // NewServiceForH2 returns a service that holds a connection to an H2 instance.
 // For now we assume that all repositories point to the same database instance.
 // Pointing different interfaces to different instances or even database is trivial at this point.
-func NewServiceForH2(url string) (Service, error) {
-	pricesRepo, err := h2Prices.NewRepository(url)
+func NewServiceForH2(priceListDbUrl, brandsDbUrl string) (Service, error) {
+	pricesRepo, err := h2Prices.NewRepository(priceListDbUrl)
 	if err != nil {
 		return nil, err
 	}
 
-	brandsRepo, err := h2Brands.NewRepository(url)
+	brandsRepo, err := h2Brands.NewRepository(brandsDbUrl)
 	if err != nil {
 		return nil, err
 	}

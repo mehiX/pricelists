@@ -7,4 +7,4 @@ RUN ./downloadH2.sh
 
 ENTRYPOINT [ "./runStandalone.sh" ]
 
-EXPOSE 9092
+EXPOSE 9092 8082 5435

@@ -23,7 +23,7 @@ func main() {
 
 	addr := os.Args[1]
 
-	svc, err := pricelist.NewServiceForH2(os.Getenv("DB_URL"))
+	svc, err := pricelist.NewServiceForH2(os.Getenv("PRICELIST_DB_URL"), os.Getenv("BRANDS_DB_URL"))
 	if err != nil {
 		panic(err)
 	}

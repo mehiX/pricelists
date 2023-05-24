@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"time"
 
-	_ "github.com/jmrobles/h2go"
+	_ "github.com/lib/pq"
 )
 
 // ConnectDbFn is the signature for a retriable function that would (eventually) return a database connection or an error
@@ -48,7 +48,7 @@ func ConnectWithRetry(f ConnectDbFn, retries int, base time.Duration, cap time.D
 
 // ConnectDB tries to connect to an H2 instance. It pings the connection before returning it
 func ConnectDB(_ context.Context, url string) (*sql.DB, error) {
-	conn, err := sql.Open("h2", url)
+	conn, err := sql.Open("postgres", url)
 	if err != nil {
 		log.Printf("Can't connet to H2 Database: %s\n", err)
 		return nil, err
