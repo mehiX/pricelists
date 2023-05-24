@@ -73,4 +73,6 @@ make binary db
 
 - Price representation - I use prices as `int64` and divide them by 100 only for use by the presentation layer.
 
-- Tests - given the limited time I chose to cover the main functionality with tests ([server_test.go](server_test.go)). The required tests are in the function `TestPrices`.
+- Tests - given the limited time I chose to cover the main functionality with tests ([server_test.go](server_test.go)). The required tests are in the function `TestPrices`. They are more integration tests than just unit tests. Normally they should be separated and ran separately using Go tags.
+
+- Git - I tried to add clear messages to my commits and they should be just as clear as the suggested tags.
