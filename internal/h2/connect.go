@@ -32,7 +32,7 @@ func ConnectWithRetry(f ConnectDbFn, retries int, base time.Duration, cap time.D
 				backoff = cap
 			}
 			jitter := rand.Int63n(int64(backoff * 3))
-			wait := base + time.Duration(jitter)
+			wait := backoff + time.Duration(jitter)
 
 			fmt.Printf("Connect attempt %d failed. Waiting %v before retrying\n", r+1, wait)
 
